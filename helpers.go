@@ -4,15 +4,39 @@ import (
 	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
-	//"crypto/rand"
 	"fmt"
-	"hash/crc32"
-	"io"
 )
 
 //------------------------------------------------------------------------------
 // Helpers
 //------------------------------------------------------------------------------
+
+// padding
+func padding(data []byte, blocklen int) ([]byte, error) {
+	padlen := 1
+	for ((len(data) + padlen) % blocklen) != 0 {
+		padlen = padlen + 1
+	}
+
+	pad := bytes.Repeat([]byte("\x00"), padlen)
+
+	return append(data, pad...), nil
+}
+
+// xorBytes
+func xorBytes(a, b []byte) ([]byte, error) {
+	if len(a) != len(b) {
+		return nil, fmt.Errorf("length of byte slices is not equivalent: %d != %d", len(a), len(b))
+	}
+
+	buf := make([]byte, len(a))
+
+	for i := range a {
+		buf[i] = a[i] ^ b[i]
+	}
+
+	return buf, nil
+}
 
 // encryptCBC
 func encryptCBC(key, iv, plaintext []byte) (ciphertext []byte, err error) {
@@ -29,32 +53,6 @@ func encryptCBC(key, iv, plaintext []byte) (ciphertext []byte, err error) {
 	cbc.CryptBlocks(ciphertext, plaintext)
 
 	return
-}
-
-// padding
-func padding(data []byte, blocklen int) ([]byte, error) {
-	padlen := 1
-	for ((len(data) + padlen) % blocklen) != 0 {
-		padlen = padlen + 1
-	}
-
-	pad := bytes.Repeat([]byte("\x00"), padlen)
-	return append(data, pad...), nil
-}
-
-// xorBytes
-func xorBytes(a, b []byte) ([]byte, error) {
-	if len(a) != len(b) {
-		return nil, fmt.Errorf("length of byte slices is not equivalent: %d != %d", len(a), len(b))
-	}
-
-	buf := make([]byte, len(a))
-
-	for i, _ := range a {
-		buf[i] = a[i] ^ b[i]
-	}
-
-	return buf, nil
 }
 
 // decryptECB
@@ -102,66 +100,4 @@ func decryptCBC(s []byte, keystring []byte) []byte {
 	mode.CryptBlocks(ciphertext, ciphertext)
 
 	return ciphertext
-}
-
-// EncryptDecrypt runs a XOR encryption on the input string, encrypting it if it hasn't already been,
-// and decrypting it if it has, using the key provided.
-func EncryptDecrypt(input, key string) (output string) {
-	for i := 0; i < len(input); i++ {
-		output += string(input[i] ^ key[i%len(key)])
-	}
-
-	return output
-}
-
-// Big-endian.
-func writeUint32(b []uint8, u uint32) {
-	b[0] = uint8(u >> 24)
-	b[1] = uint8(u >> 16)
-	b[2] = uint8(u >> 8)
-	b[3] = uint8(u >> 0)
-}
-
-func createChunk(w io.Writer, b []byte, name string) error {
-	var header [8]byte
-	var footer [4]byte
-
-	// Calculate the length
-	n := uint32(len(b))
-	if int(n) != len(b) {
-		return fmt.Errorf("Error with the length")
-	}
-
-	// Write the length
-	writeUint32(header[:4], n)
-
-	// Wirte the type
-	header[4] = name[0]
-	header[5] = name[1]
-	header[6] = name[2]
-	header[7] = name[3]
-
-	// Calculate the CRC32
-	crc := crc32.NewIEEE()
-	crc.Write(header[4:8])
-	crc.Write(b)
-
-	// Write the CRC32
-	writeUint32(footer[:4], crc.Sum32())
-
-	// Write the chunk
-	_, err := w.Write(header[:8])
-	if err != nil {
-		return fmt.Errorf("Error while writing the header : %s", err)
-	}
-	_, err = w.Write(b)
-	if err != nil {
-		return fmt.Errorf("Error while writing the header : %s", err)
-	}
-	_, err = w.Write(footer[:4])
-	if err != nil {
-		return fmt.Errorf("Error while writing the header : %s", err)
-	}
-
-	return nil
 }

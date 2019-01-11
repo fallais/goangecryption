@@ -70,6 +70,8 @@ func (p *PNGHide) Hide(img1, img2 string) ([]byte, error) {
 		return nil, fmt.Errorf("Error while padding the file1 : %s", err)
 	}
 
+	fmt.Println(string(file1Padded))
+
 	// Process the size
 	size := len(file1Padded) - BlockSize
 	fmt.Println("The decimal size of the file is :", size)
@@ -96,15 +98,16 @@ func (p *PNGHide) Hide(img1, img2 string) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("Error while xoring the arrays : %s", err)
 	}
-	fmt.Println("Xored is :", fmt.Sprintf("%x", iv))
+	fmt.Println("IV is :", fmt.Sprintf("%x", iv))
+	fmt.Println("Key is :", p.Key)
 
-	// AES encrypt file1
+	// Encrypt file1 with AES-CBC
 	file1Encrypted, err := encryptCBC([]byte(p.Key), iv, file1Padded)
 	if err != nil {
 		return nil, fmt.Errorf("Error while encrypting the file1 : %s", err)
 	}
 
-	fmt.Println(string(file1Encrypted))
+	//fmt.Println(string(file1Encrypted))
 
 	// Calculate the CRC32
 	crc := crc32.NewIEEE()
