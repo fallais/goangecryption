@@ -36,7 +36,7 @@ func init() {
 }
 
 func main() {
-	ph := pnghide.NewPNGHide("alpacaAndKoala!!")
+	ph := pnghide.NewPNGHide("AngeCryptionKey!")
 	_, err := ph.Hide(*img1, *img2)
 	if err != nil {
 		logrus.Fatalln("Error while hidding :", err)

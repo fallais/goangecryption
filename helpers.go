@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
-	"crypto/rand"
+	//"crypto/rand"
 	"fmt"
 	"hash/crc32"
 	"io"
@@ -14,43 +14,36 @@ import (
 // Helpers
 //------------------------------------------------------------------------------
 
-func encryptCBC(key, plaintext []byte) (ciphertext []byte, err error) {
+// encryptCBC
+func encryptCBC(key, iv, plaintext []byte) (ciphertext []byte, err error) {
 	if len(plaintext)%aes.BlockSize != 0 {
-		panic("plaintext is not a multiple of the block size")
+		return nil, fmt.Errorf("plaintext is not a multiple of the block size")
 	}
 
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		panic(err)
 	}
-
-	ciphertext = make([]byte, aes.BlockSize+len(plaintext))
-	iv := ciphertext[:aes.BlockSize]
-	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
-		panic(err)
-	}
-
+	ciphertext = make([]byte, len(plaintext))
 	cbc := cipher.NewCBCEncrypter(block, iv)
-	cbc.CryptBlocks(ciphertext[aes.BlockSize:], plaintext)
+	cbc.CryptBlocks(ciphertext, plaintext)
 
 	return
 }
 
-// Appends padding.
+// padding
 func padding(data []byte, blocklen int) ([]byte, error) {
-	if blocklen <= 0 {
-		return nil, fmt.Errorf("invalid blocklen %d", blocklen)
-	}
 	padlen := 1
 	for ((len(data) + padlen) % blocklen) != 0 {
 		padlen = padlen + 1
 	}
 
-	pad := bytes.Repeat([]byte{byte(padlen)}, padlen)
+	pad := bytes.Repeat([]byte("\x00"), padlen)
 	return append(data, pad...), nil
 }
 
-func XORBytes(a, b []byte) ([]byte, error) {
+// xorBytes
+func xorBytes(a, b []byte) ([]byte, error) {
 	if len(a) != len(b) {
 		return nil, fmt.Errorf("length of byte slices is not equivalent: %d != %d", len(a), len(b))
 	}
@@ -64,19 +57,18 @@ func XORBytes(a, b []byte) ([]byte, error) {
 	return buf, nil
 }
 
-func decryptAes128Ecb(data, key []byte) []byte {
-	cipher, _ := aes.NewCipher([]byte(key))
-	decrypted := make([]byte, len(data))
-	size := 16
-
-	for bs, be := 0, size; bs < len(data); bs, be = bs+size, be+size {
-		cipher.Decrypt(decrypted[bs:be], data[bs:be])
+// decryptECB
+func decryptECB(data, key []byte) []byte {
+	cipher, err := aes.NewCipher(key)
+	if err == nil {
+		cipher.Decrypt(data, data)
+		return data
 	}
-
-	return decrypted
+	return nil
 }
 
-func decrypt(s []byte, keystring []byte) []byte {
+// decryptCBC
+func decryptCBC(s []byte, keystring []byte) []byte {
 	// Byte array of the string
 	ciphertext := s
 
