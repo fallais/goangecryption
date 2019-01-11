@@ -6,11 +6,11 @@ Based on the great work of `Ange Albertini` : https://www.youtube.com/watch?v=iI
 
 I1 : first image
 
-![I1](https://github.com/fallais/go-siem/blob/master/example/alpaca.png)
+![I1](https://github.com/fallais/pnghide/blob/master/example/alpaca.png)
 
 I2 : second image
 
-![I2](https://github.com/fallais/go-siem/blob/master/example/koala.png)
+![I2](https://github.com/fallais/pnghide/blob/master/example/koala.png)
 
 Key : `alpacaAndKoala!`
 
