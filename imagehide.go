@@ -2,6 +2,7 @@ package pnghide
 
 import (
 	"bytes"
+	"encoding/binary"
 	"errors"
 	"fmt"
 	"hash/crc32"
@@ -70,8 +71,6 @@ func (p *PNGHide) Hide(img1, img2 string) ([]byte, error) {
 		return nil, fmt.Errorf("Error while padding the file1 : %s", err)
 	}
 
-	//fmt.Println(string(file1Padded))
-
 	// Process the size
 	size := len(file1Padded) - BlockSize
 	fmt.Println("The decimal size of the file is :", size)
@@ -87,7 +86,7 @@ func (p *PNGHide) Hide(img1, img2 string) ([]byte, error) {
 	c1.WriteByte(uint8(u >> 0))
 	c1.WriteString(fakeType)
 
-	// Decrypt C1
+	// Decrypt C1 with AES-ECB
 	c1Decrypted := decryptECB(c1.Bytes(), []byte(p.Key))
 
 	// Create P1
@@ -98,7 +97,7 @@ func (p *PNGHide) Hide(img1, img2 string) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("Error while xoring the arrays : %s", err)
 	}
-	fmt.Println("IV is :", fmt.Sprintf("%x", iv))
+	fmt.Println("IV is :", fmt.Sprintf("%x", iv), string(iv))
 	fmt.Println("Key is :", p.Key)
 
 	// Encrypt file1 with AES-CBC
@@ -107,13 +106,22 @@ func (p *PNGHide) Hide(img1, img2 string) ([]byte, error) {
 		return nil, fmt.Errorf("Error while encrypting the file1 : %s", err)
 	}
 
-	fmt.Println(string(file1Encrypted))
-
 	// Calculate the CRC32
 	crc := crc32.NewIEEE()
 	crc.Write(file1Encrypted[12:])
 	str := strconv.Itoa(int(crc.Sum32()))
-	file1Encrypted = append(file1Encrypted, []byte(str)...)
+	fmt.Println(str, fmt.Sprintf("%x", str), strconv.FormatInt(int64(crc.Sum32()), 16))
+	var bufi bytes.Buffer
+	err = binary.Write(&bufi, binary.BigEndian, int32(crc.Sum32()))
+	if err != nil {
+		fmt.Println("binary.Write failed:", err)
+	}
+	file1Encrypted = append(file1Encrypted, bufi.Bytes()...)
+
+	err = ioutil.WriteFile("file1Encrypted.png", file1Encrypted, 0644)
+	if err != nil {
+		return nil, fmt.Errorf("Error while writing the final file : %s", err)
+	}
 
 	// Read the img2
 	file2, err := ioutil.ReadFile(img2)
