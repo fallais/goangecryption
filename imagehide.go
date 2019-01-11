@@ -70,7 +70,7 @@ func (p *PNGHide) Hide(img1, img2 string) ([]byte, error) {
 		return nil, fmt.Errorf("Error while padding the file1 : %s", err)
 	}
 
-	fmt.Println(string(file1Padded))
+	//fmt.Println(string(file1Padded))
 
 	// Process the size
 	size := len(file1Padded) - BlockSize
@@ -107,7 +107,7 @@ func (p *PNGHide) Hide(img1, img2 string) ([]byte, error) {
 		return nil, fmt.Errorf("Error while encrypting the file1 : %s", err)
 	}
 
-	//fmt.Println(string(file1Encrypted))
+	fmt.Println(string(file1Encrypted))
 
 	// Calculate the CRC32
 	crc := crc32.NewIEEE()
