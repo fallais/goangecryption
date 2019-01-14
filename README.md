@@ -57,3 +57,31 @@ The reversed operation can be achieved by encrypting the image with **AES-CBC** 
 
 ## How to use it ?
 
+This library can be used as follow.
+
+```go
+package main
+
+import (
+	"flag"
+	"time"
+
+	"goangecryption"
+
+	"github.com/sirupsen/logrus"
+)
+
+var (
+	img1    = flag.String("img1", "koala.png", "First image path")
+	img2    = flag.String("img2", "alpaca.png", "Second image path")
+	key = flag.String("key", "alpacaAndKoala!!", "Key")
+)
+
+func main() {
+	ph := goangecryption.NewPNGHide(*key)
+	_, err := ph.Hide(*img1, *img2)
+	if err != nil {
+		logrus.Fatalln("Error while hidding :", err)
+	}
+}
+```

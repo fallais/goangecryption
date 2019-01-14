@@ -1,4 +1,4 @@
-package pnghide
+package goangecryption
 
 import (
 	"bytes"

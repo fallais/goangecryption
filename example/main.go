@@ -4,7 +4,7 @@ import (
 	"flag"
 	"time"
 
-	"pnghide"
+	"goangecryption"
 
 	"github.com/sirupsen/logrus"
 )
@@ -37,7 +37,7 @@ func init() {
 }
 
 func main() {
-	ph := pnghide.NewPNGHide(*key)
+	ph := goangecryption.NewPNGHide(*key)
 	_, err := ph.Hide(*img1, *img2)
 	if err != nil {
 		logrus.Fatalln("Error while hidding :", err)

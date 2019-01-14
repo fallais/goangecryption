@@ -1,4 +1,4 @@
-package pnghide
+package goangecryption
 
 import (
 	"bytes"
@@ -39,20 +39,21 @@ func xorBytes(a, b []byte) ([]byte, error) {
 }
 
 // encryptCBC
-func encryptCBC(key, iv, plaintext []byte) (ciphertext []byte, err error) {
+func encryptCBC(key, iv, plaintext []byte) ([]byte, error) {
 	if len(plaintext)%aes.BlockSize != 0 {
 		return nil, fmt.Errorf("plaintext is not a multiple of the block size")
 	}
 
 	block, err := aes.NewCipher(key)
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("Error while creating the AES block: %s", err)
 	}
-	ciphertext = make([]byte, len(plaintext))
+
+	ciphertext := make([]byte, len(plaintext))
 	cbc := cipher.NewCBCEncrypter(block, iv)
 	cbc.CryptBlocks(ciphertext, plaintext)
 
-	return
+	return ciphertext, nil
 }
 
 // decryptECB
