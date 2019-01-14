@@ -24,10 +24,13 @@ var (
 	ErrInvalidCharacter = errors.New("Invalid character")
 )
 
-const pngHeader = "\x89PNG\r\n\x1a\n"
-const fakeType = "rmll"
+// PNGHeader is the PNG magic header.
+const PNGHeader = "\x89PNG\r\n\x1a\n"
 
-// BlockSize ...
+// FakeChunkType is the fake PNG chunk type.
+const FakeChunkType = "ilym"
+
+// BlockSize is the size of the AES block.
 const BlockSize = 16
 
 //------------------------------------------------------------------------------
@@ -79,13 +82,13 @@ func (p *PNGHide) Hide(img1, img2 string) ([]byte, error) {
 
 	// Create C1
 	var c1 bytes.Buffer
-	c1.WriteString(pngHeader)
+	c1.WriteString(PNGHeader)
 	u := uint32(size)
 	c1.WriteByte(uint8(u >> 24))
 	c1.WriteByte(uint8(u >> 16))
 	c1.WriteByte(uint8(u >> 8))
 	c1.WriteByte(uint8(u >> 0))
-	c1.WriteString(fakeType)
+	c1.WriteString(FakeChunkType)
 
 	// Decrypt C1 with AES-ECB
 	c1Decrypted := decryptECB(c1.Bytes(), []byte(p.Key))

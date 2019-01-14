@@ -2,7 +2,11 @@
 
 Based on the great work of `Ange Albertini` : https://www.youtube.com/watch?v=iIesDpv9F4s
 
-## Information
+## How it works ?
+
+### Prerequisites
+
+Key : `alpacaAndKoala!!`
 
 I1 : first image
 
@@ -12,26 +16,16 @@ I2 : second image
 
 ![I2](https://github.com/fallais/pnghide/blob/master/example/koala.png)
 
-Key : `alpacaAndKoala!`
+## Step 1 : determine the IV
 
-## Step 0 : checks
+In order to determine the first encrypted block :
 
-These conditions must be respected :
+- Open the `img1`
+- Right padding of the `img1`
+- Calculate the size of the `img1` and substract `16` (which is the **BlockSize**)
+- Create the block : **PNG Header** +  **Size** + **Fake Type (rmmll)**
+- Decrypt the block with **AES-ECB**
+- XOR this block with the first `16 bytes` of the `img1`
 
-- `I1` and `I2` are PNGs ;
-- `I1` fits into only on chunk of `I2`.
-
-## Step 1 : determine the first encrypted block
-
-`R` will have the same first block as `I1`.
-
-Once `encrypted`, `R` will start with :
-
-- PNG magic header of `8 bytes` : `\x89PNG\r\n\x1a\n`
-- A storage chunk with a fake type `rmll` that will contains `I1` with a length of `16926 - 6 = 16920 = 00004218 (hex)`
-
-> A PNG chunk is composed of the `length`, the `type`, the `data` and the `CRC`.
-
-First block of `R`, `P1`, comes from `I1` : `\x89PNG\r\n\x1a\n \x00\x00\x00\x0D IHDR`.  
-First encrypted block of `R`, `P2` :  `\x89PNG\r\n\x1a\n \x00\x00\x42\x18 rmll`.
-
+`IV` is the result : `56a26af016bfac33f529597c35ad977a`.  
+And the key is still : `alpacaAndKoala!!`.
