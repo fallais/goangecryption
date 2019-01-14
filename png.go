@@ -45,7 +45,7 @@ func (p *GoAngecryption) HidePNG(img1, img2, dst string) ([]byte, error) {
 	// Create P1
 	p1 := file1[:BlockSize]
 
-	// XOR P2 with P1
+	// XOR C1 with P1
 	iv, err := xorBytes(c1Decrypted, []byte(p1))
 	if err != nil {
 		return nil, fmt.Errorf("Error while xoring the arrays : %s", err)

@@ -2,8 +2,8 @@ package main
 
 import (
 	"flag"
-	"time"
 	"fmt"
+	"time"
 
 	"goangecryption"
 
@@ -11,9 +11,6 @@ import (
 )
 
 var (
-	img1    = flag.String("img1", "koala.png", "First image path")
-	img2    = flag.String("img2", "alpaca.png", "Second image path")
-	key     = flag.String("key", "alpacaAndKoala!!", "Key")
 	logging = flag.String("logging", "info", "Logging level")
 )
 
@@ -39,15 +36,15 @@ func init() {
 
 func main() {
 	// Create the AC
-	ga := goangecryption.NewGoAngecryption(*key)
+	ga := goangecryption.NewGoAngecryption("alpacaAndKoala!!")
 
 	// Hide the image
-	iv, err := ga.HidePNG(*img1, *img2, "hide.png")
+	iv, err := ga.HidePNG("koala.png", "alpaca.png", "hide.png")
 	if err != nil {
 		logrus.Fatalln("Error while hidding :", err)
 	}
 
-	logrus.Infoln("The image has been hidden, the IV is :", fmt.Sprintf("%x", iv))
+	logrus.Infoln("The PNG image has been hidden, the IV is :", fmt.Sprintf("%x", iv))
 
 	// Reveal the image
 	err = ga.RevealPNG("hide.png", iv, "reveal.png")
@@ -55,5 +52,13 @@ func main() {
 		logrus.Fatalln("Error while revealing :", err)
 	}
 
-	logrus.Infoln("The image has been revealed")
+	logrus.Infoln("The PNG image has been revealed")
+
+	// Hide the image
+	iv, err = ga.HideJPG("koala.jpg", "alpaca.jpg", "hide.jpg")
+	if err != nil {
+		logrus.Fatalln("Error while hidding the JPG :", err)
+	}
+
+	logrus.Infoln("The JPG image has been hidden, the IV is :", fmt.Sprintf("%x", iv))
 }
