@@ -6,13 +6,15 @@ This library is the **Golang** version of the great work of [Ange Albertini](htt
 
 ### Prerequisites
 
-Key : `alpacaAndKoala!!`
+**Key** (16 bytes long) : `alpacaAndKoala!!`
 
-I1 : first image
+**FakeChunkType** : `ilym`
+
+**First image** :
 
 ![I1](https://github.com/fallais/go-angecryption/blob/master/example/alpaca.png)
 
-I2 : second image
+**Second image** :
 
 ![I2](https://github.com/fallais/go-angecryption/blob/master/example/koala.png)
 
@@ -66,7 +68,7 @@ import (
 	"flag"
 	"time"
 
-	"goangecryption"
+	"github.com/fallais/goangecryption"
 
 	"github.com/sirupsen/logrus"
 )
