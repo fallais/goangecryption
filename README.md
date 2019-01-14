@@ -1,4 +1,4 @@
-# go-angecryption
+# goangecryption
 
 This library is the **Golang** version of the great work of [Ange Albertini](https://corkami.github.io/).  
 
@@ -47,7 +47,7 @@ In order to generate the result :
 
 - Open the `img2`
 - Right padding of the `img2`
-- Append the `img2` to the to the encrypted `img1` (except the first 8 bytes)
+- Append the `img2` to the to the encrypted `img1` (except the first 8 bytes not needed because they are the *PNG Header*)
 - Right padding of the result
 - Decrypt the result with **AES-CBC** and the **key** and **IV** we calculated previously
 - Write the result into a file
