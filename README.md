@@ -20,6 +20,8 @@ This library is the **Golang** version of the great work of [Ange Albertini](htt
 
 > A PNG chunk is composed of : **Size (4-byte)** | **Name (4-byte)** | **Data (n-byte)** | **CRC32 (4-byte)**
 
+> It could be useful to read the [PNG specifications](http://www.libpng.org/pub/png/spec/1.2/PNG-Contents.html)
+
 ### Step 1 : determine the IV
 
 In order to determine the first encrypted block :
