@@ -72,8 +72,9 @@ func (p *PNGHide) Hide(img1, img2 string) ([]byte, error) {
 	}
 
 	// Process the size
+	fmt.Println("The decimal size of the file is :", len(file1Padded))
 	size := len(file1Padded) - BlockSize
-	fmt.Println("The decimal size of the file is :", size)
+	fmt.Println("The decimal size of the file after substracting block size is :", size)
 	fmt.Println("The hex size of the file is :", strconv.FormatInt(int64(size), 16))
 
 	// Create C1
@@ -97,7 +98,7 @@ func (p *PNGHide) Hide(img1, img2 string) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("Error while xoring the arrays : %s", err)
 	}
-	fmt.Println("IV is :", fmt.Sprintf("%x", iv), string(iv))
+	fmt.Println("IV is :", fmt.Sprintf("%x", iv))
 	fmt.Println("Key is :", p.Key)
 
 	// Encrypt file1 with AES-CBC
@@ -109,19 +110,12 @@ func (p *PNGHide) Hide(img1, img2 string) ([]byte, error) {
 	// Calculate the CRC32
 	crc := crc32.NewIEEE()
 	crc.Write(file1Encrypted[12:])
-	str := strconv.Itoa(int(crc.Sum32()))
-	fmt.Println(str, fmt.Sprintf("%x", str), strconv.FormatInt(int64(crc.Sum32()), 16))
 	var bufi bytes.Buffer
 	err = binary.Write(&bufi, binary.BigEndian, int32(crc.Sum32()))
 	if err != nil {
-		fmt.Println("binary.Write failed:", err)
+		return nil, fmt.Errorf("Error while writing the CRC32 in binary buffer : %s", err)
 	}
 	file1Encrypted = append(file1Encrypted, bufi.Bytes()...)
-
-	err = ioutil.WriteFile("file1Encrypted.png", file1Encrypted, 0644)
-	if err != nil {
-		return nil, fmt.Errorf("Error while writing the final file : %s", err)
-	}
 
 	// Read the img2
 	file2, err := ioutil.ReadFile(img2)
@@ -129,15 +123,25 @@ func (p *PNGHide) Hide(img1, img2 string) ([]byte, error) {
 		return nil, fmt.Errorf("Error while reading the file2 : %s", err)
 	}
 
-	// Append the img2
-	file1Encrypted = append(file1Encrypted, file2[8:]...)
+	// Right padding of the img1
+	file2Padded, err := padding(file2, 16)
+	if err != nil {
+		return nil, fmt.Errorf("Error while padding the file2 : %s", err)
+	}
 
-	// Write the file
+	// Append the img2
+	file1Encrypted = append(file1Encrypted, file2Padded[8:]...)
+
+	// Right padding of the result
 	finalPadded, err := padding(file1Encrypted, 16)
 	if err != nil {
 		return nil, fmt.Errorf("Error while padding the final file : %s", err)
 	}
-	final := decryptCBC(finalPadded, []byte(p.Key))
+
+	// Decrypt the result with AES-CBC
+	final := decryptCBC(finalPadded, []byte(p.Key), iv)
+
+	// Write the result file
 	err = ioutil.WriteFile("final.png", final, 0644)
 	if err != nil {
 		return nil, fmt.Errorf("Error while writing the final file : %s", err)

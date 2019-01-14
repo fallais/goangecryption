@@ -66,13 +66,7 @@ func decryptECB(data, key []byte) []byte {
 }
 
 // decryptCBC
-func decryptCBC(s []byte, keystring []byte) []byte {
-	// Byte array of the string
-	ciphertext := s
-
-	// Key
-	key := keystring
-
+func decryptCBC(ciphertext, key, iv []byte) []byte {
 	// Create the AES cipher
 	block, err := aes.NewCipher(key)
 	if err != nil {
@@ -84,10 +78,6 @@ func decryptCBC(s []byte, keystring []byte) []byte {
 	if len(ciphertext) < aes.BlockSize {
 		panic("Text is too short")
 	}
-
-	// Get the 16 byte IV
-	iv := ciphertext[:aes.BlockSize]
-	ciphertext = ciphertext[aes.BlockSize:]
 
 	// CBC mode always works in whole blocks.
 	if len(ciphertext)%aes.BlockSize != 0 {
