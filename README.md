@@ -8,7 +8,7 @@ This library is the **Golang** version of the great work of [Ange Albertini](htt
 
 **Key** (16 bytes long) : `alpacaAndKoala!!`
 
-**FakeChunkType** : `ilym`
+**FakeChunkType** (whatever the 4 chars string starting with lowercase) : `ilym`
 
 **First image** :
 
@@ -80,8 +80,8 @@ var (
 )
 
 func main() {
-	ph := goangecryption.NewPNGHide(*key)
-	_, err := ph.Hide(*img1, *img2)
+	ga := goangecryption.NewPNGHide(*key)
+	_, err := ga.Hide(*img1, *img2)
 	if err != nil {
 		logrus.Fatalln("Error while hidding :", err)
 	}

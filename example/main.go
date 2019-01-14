@@ -37,8 +37,8 @@ func init() {
 }
 
 func main() {
-	ph := goangecryption.NewPNGHide(*key)
-	_, err := ph.Hide(*img1, *img2)
+	ga := goangecryption.NewPNGHide(*key)
+	_, err := ga.Hide(*img1, *img2)
 	if err != nil {
 		logrus.Fatalln("Error while hidding :", err)
 	}
