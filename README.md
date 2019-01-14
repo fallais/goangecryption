@@ -12,11 +12,11 @@ This library is the **Golang** version of the great work of [Ange Albertini](htt
 
 **First image** :
 
-![I1](https://github.com/fallais/go-angecryption/blob/master/example/alpaca.png)
+![I1](https://github.com/fallais/goangecryption/blob/master/example/alpaca.png)
 
 **Second image** :
 
-![I2](https://github.com/fallais/go-angecryption/blob/master/example/koala.png)
+![I2](https://github.com/fallais/goangecryption/blob/master/example/koala.png)
 
 > A PNG chunk is composed of : **Size (4-byte)** | **Name (4-byte)** | **Data (n-byte)** | **CRC32 (4-byte)**
 
