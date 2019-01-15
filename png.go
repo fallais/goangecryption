@@ -76,7 +76,7 @@ func (p *GoAngecryption) HidePNG(img1, img2, dst string) ([]byte, error) {
 		return nil, fmt.Errorf("Error while reading the file2 : %s", err)
 	}
 
-	// Right padding of the img1
+	// Right padding of the img2
 	file2Padded, err := padding(file2, 16)
 	if err != nil {
 		return nil, fmt.Errorf("Error while padding the file2 : %s", err)

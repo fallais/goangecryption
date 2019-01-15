@@ -26,7 +26,7 @@ func (p *GoAngecryption) HideJPG(img1, img2, dst string) ([]byte, error) {
 	}
 
 	// Process the size
-	size := len(file1) - BlockSize
+	size := len(file1Padded) - BlockSize
 
 	// Create C1
 	var c1 bytes.Buffer
@@ -38,9 +38,15 @@ func (p *GoAngecryption) HideJPG(img1, img2, dst string) ([]byte, error) {
 	c1.WriteString(strings.Repeat("\x00", 10))
 
 	// Decrypt C1 with AES-ECB
-	iv, err := decryptECB(c1.Bytes(), []byte(p.Key))
+	c1Decrypted, err := decryptECB(c1.Bytes(), []byte(p.Key))
 	if err != nil {
 		return nil, fmt.Errorf("Error while decrypting the file with AES-ECB : %s", err)
+	}
+
+	// XOR C1 with P1
+	iv, err := xorBytes(c1Decrypted, []byte(file1[:BlockSize]))
+	if err != nil {
+		return nil, fmt.Errorf("Error while xoring the arrays : %s", err)
 	}
 
 	// Encrypt
@@ -52,14 +58,26 @@ func (p *GoAngecryption) HideJPG(img1, img2, dst string) ([]byte, error) {
 	// Read the img2
 	file2, err := ioutil.ReadFile(img2)
 	if err != nil {
-		return nil, fmt.Errorf("Error while reading the file1 : %s", err)
+		return nil, fmt.Errorf("Error while reading the file2 : %s", err)
+	}
+
+	// Right padding of the img2
+	file2Padded, err := padding(file2, 16)
+	if err != nil {
+		return nil, fmt.Errorf("Error while padding the file2 : %s", err)
 	}
 
 	// Append
-	result = append(result, file2[2:]...)
+	result = append(result, file2Padded[2:]...)
+
+	// Right padding of the result
+	resultPadded, err := padding(result, 16)
+	if err != nil {
+		return nil, fmt.Errorf("Error while padding the result : %s", err)
+	}
 
 	// Write the result file
-	err = ioutil.WriteFile(dst, result, 0644)
+	err = ioutil.WriteFile(dst, resultPadded, 0644)
 	if err != nil {
 		return nil, fmt.Errorf("Error while writing the final file : %s", err)
 	}
@@ -68,6 +86,24 @@ func (p *GoAngecryption) HideJPG(img1, img2, dst string) ([]byte, error) {
 }
 
 // RevealJPG reveals the image hidden in the image.
-func (p *GoAngecryption) RevealJPG(img1 string, iv []byte) ([]byte, error) {
-	return nil, nil
+func (p *GoAngecryption) RevealJPG(img string, iv []byte, dst string) error {
+	// Read the img
+	file, err := ioutil.ReadFile(img)
+	if err != nil {
+		return fmt.Errorf("Error while reading the file : %s", err)
+	}
+
+	// Write the encrypted file
+	fileEncrypted, err := encryptCBC([]byte(p.Key), iv, file)
+	if err != nil {
+		return fmt.Errorf("Error while encrypting the file : %s", err)
+	}
+
+	// Write the result
+	err = ioutil.WriteFile(dst, fileEncrypted, 0644)
+	if err != nil {
+		return fmt.Errorf("Error while writing the final file : %s", err)
+	}
+
+	return nil
 }
