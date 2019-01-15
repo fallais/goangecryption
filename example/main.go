@@ -39,7 +39,29 @@ func main() {
 	ga := goangecryption.NewGoAngecryption("alpacaAndKoala!!")
 
 	// Hide the image
-	iv, err := ga.HidePNG("koala.png", "alpaca.png", "hide.png")
+	iv, err := ga.HidePNG("png/koala.png", "png/alpaca.png", "hide.png")
+	if err != nil {
+		logrus.Fatalln("Error while hidding :", err)
+	}
+
+	logrus.WithFields(logrus.Fields{
+    "IV": fmt.Sprintf("%x", iv),
+  }).Infoln("The PNG image has been hidden")
+
+	// Reveal the image
+	err = ga.Reveal("hide.png", iv, "reveal.png")
+	if err != nil {
+		logrus.Fatalln("Error while revealing the PNG image :", err)
+	}
+
+	logrus.Infoln("The PNG image has been revealed")
+
+	/////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////
+
+	// Hide the image
+	iv, err = ga.HidePNG("txt/roxor.txt", "png/alpaca.png", "hide.png")
 	if err != nil {
 		logrus.Fatalln("Error while hidding :", err)
 	}
