@@ -90,26 +90,3 @@ func (p *GoAngecryption) HideJPG(img1, img2, dst string) ([]byte, error) {
 
 	return iv, nil
 }
-
-// RevealJPG reveals the image hidden in the image.
-func (p *GoAngecryption) RevealJPG(img string, iv []byte, dst string) error {
-	// Read the img
-	file, err := ioutil.ReadFile(img)
-	if err != nil {
-		return fmt.Errorf("Error while reading the file : %s", err)
-	}
-
-	// Write the encrypted file
-	fileEncrypted, err := encryptCBC([]byte(p.Key), iv, file)
-	if err != nil {
-		return fmt.Errorf("Error while encrypting the file : %s", err)
-	}
-
-	// Write the result
-	err = ioutil.WriteFile(dst, fileEncrypted, 0644)
-	if err != nil {
-		return fmt.Errorf("Error while writing the final file : %s", err)
-	}
-
-	return nil
-}

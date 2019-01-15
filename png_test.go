@@ -32,7 +32,7 @@ func TestHidePNG(t *testing.T) {
 	}
 
 	// Reveal the image
-	err = ga.RevealPNG("example/googleAndDuck/hide.png", iv, "example/googleAndDuck/result2.png")
+	err = ga.Reveal("example/googleAndDuck/hide.png", iv, "example/googleAndDuck/result2.png")
 	if err != nil {
 		t.Fatal("Error while revealing the PNG image :", err)
 	}

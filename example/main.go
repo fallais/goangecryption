@@ -49,28 +49,10 @@ func main() {
   }).Infoln("The PNG image has been hidden")
 
 	// Reveal the image
-	err = ga.RevealPNG("hide.png", iv, "reveal.png")
+	err = ga.Reveal("hide.png", iv, "reveal.txt")
 	if err != nil {
 		logrus.Fatalln("Error while revealing the PNG image :", err)
 	}
 
 	logrus.Infoln("The PNG image has been revealed")
-
-	// Hide the image
-	iv, err = ga.HideJPG("koala.jpg", "alpaca.jpg", "hide.jpg")
-	if err != nil {
-		logrus.Fatalln("Error while hidding the JPG :", err)
-	}
-
-	logrus.WithFields(logrus.Fields{
-    "IV": fmt.Sprintf("%x", iv),
-  }).Infoln("The JPG image has been hidden")
-
-	// Reveal the image
-	err = ga.RevealJPG("hide.jpg", iv, "reveal.jpg")
-	if err != nil {
-		logrus.Fatalln("Error while revealing the JPG image :", err)
-	}
-
-	logrus.Infoln("The JPG image has been revealed")
 }

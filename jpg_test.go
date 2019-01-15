@@ -32,7 +32,7 @@ func TestHideJPG(t *testing.T) {
 	}
 
 	// Reveal the image
-	err = ga.RevealJPG("example/jpg/hide.jpg", iv, "example/jpg/result2.jpg")
+	err = ga.Reveal("example/jpg/hide.jpg", iv, "example/jpg/result2.jpg")
 	if err != nil {
 		t.Fatal("Error while revealing the JPG image :", err)
 	}
