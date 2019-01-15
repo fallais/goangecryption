@@ -4,7 +4,7 @@ package goangecryption
 const PNGHeader = "\x89PNG\r\n\x1a\n"
 
 // JPGHeader is the JPG magic header.
-const JPGHeader = "\xff\xd8"
+const JPGHeader = "\xFF\xD8"
 
 // FakeChunkType is the fake PNG chunk type.
 const FakeChunkType = "ilym"
@@ -18,7 +18,7 @@ const BlockSize = 16
 
 // GoAngecryption is the Go version of Angecryption.
 type GoAngecryption struct {
-	// Key is the key.
+	// Key is the secret key.
 	Key string
 }
 

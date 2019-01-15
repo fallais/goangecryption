@@ -38,7 +38,10 @@ func (p *GoAngecryption) HideJPG(img1, img2, dst string) ([]byte, error) {
 	c1.WriteString(strings.Repeat("\x00", 10))
 
 	// Decrypt C1 with AES-ECB
-	iv := decryptECB(c1.Bytes(), []byte(p.Key))
+	iv, err := decryptECB(c1.Bytes(), []byte(p.Key))
+	if err != nil {
+		return nil, fmt.Errorf("Error while decrypting the file with AES-ECB : %s", err)
+	}
 
 	// Encrypt
 	result, err := encryptCBC([]byte(p.Key), iv, file1Padded)

@@ -40,7 +40,10 @@ func (p *GoAngecryption) HidePNG(img1, img2, dst string) ([]byte, error) {
 	c1.WriteString(FakeChunkType)
 
 	// Decrypt C1 with AES-ECB
-	c1Decrypted := decryptECB(c1.Bytes(), []byte(p.Key))
+	c1Decrypted, err := decryptECB(c1.Bytes(), []byte(p.Key))
+	if err != nil {
+		return nil, fmt.Errorf("Error while decrypting the file with AES-ECB : %s", err)
+	}
 
 	// Create P1
 	p1 := file1[:BlockSize]
@@ -89,7 +92,10 @@ func (p *GoAngecryption) HidePNG(img1, img2, dst string) ([]byte, error) {
 	}
 
 	// Decrypt the result with AES-CBC
-	final := decryptCBC(finalPadded, []byte(p.Key), iv)
+	final, err := decryptCBC(finalPadded, []byte(p.Key), iv)
+	if err != nil {
+		return nil, fmt.Errorf("Error while decrupting the final file with AES-CBC : %s", err)
+	}
 
 	// Write the result file
 	err = ioutil.WriteFile(dst, final, 0644)

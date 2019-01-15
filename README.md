@@ -2,11 +2,13 @@
 
 This library is the **Golang** version of the great work of [Ange Albertini](https://corkami.github.io/).  
 
+> It could be useful to read the [PNG specifications](http://www.libpng.org/pub/png/spec/1.2/PNG-Contents.html) before to start.
+
 ## How it works ?
 
 ### Prerequisites
 
-**Key** (16 bytes long) : `alpacaAndKoala!!`
+**Key** (length must be *16*) : `alpacaAndKoala!!`
 
 **FakeChunkType** (whatever the 4 chars string starting with lowercase) : `ilym`
 
@@ -20,16 +22,14 @@ This library is the **Golang** version of the great work of [Ange Albertini](htt
 
 > A PNG chunk is composed of : **Size (4-byte)** | **Name (4-byte)** | **Data (n-byte)** | **CRC32 (4-byte)**
 
-> It could be useful to read the [PNG specifications](http://www.libpng.org/pub/png/spec/1.2/PNG-Contents.html)
-
 ### Step 1 : determine the IV
 
 In order to determine the first encrypted block :
 
 - Open the `img1`
-- Right padding of the `img1`
+- Right padding of the `img1` (modulo *16*)
 - Calculate the size of the `img1` and substract `16` (which is the **BlockSize**)
-- Create the block : **PNG Header** +  **Size** + **Fake Type (rmmll)**
+- Create the block : **PNG Header** +  **Size** + **Fake Type (ilym)**
 - Decrypt the block with **AES-ECB**
 - XOR this block with the first `16 bytes` of the `img1`
 
@@ -48,9 +48,9 @@ In order to prepare the storage chunk :
 In order to generate the result :
 
 - Open the `img2`
-- Right padding of the `img2`
+- Right padding of the `img2` (modulo *16*)
 - Append the `img2` to the to the encrypted `img1` (except the first 8 bytes not needed because they are the *PNG Header*)
-- Right padding of the result
+- Right padding of the result (modulo *16*)
 - Decrypt the result with **AES-CBC** and the **key** and **IV** we calculated previously
 - Write the result into a file
 - Provide the `IV` to allow the reversed operation
@@ -63,29 +63,4 @@ The reversed operation can be achieved by encrypting the image with **AES-CBC** 
 
 This library can be used as follow.
 
-```go
-package main
-
-import (
-	"flag"
-	"time"
-
-	"github.com/fallais/goangecryption"
-
-	"github.com/sirupsen/logrus"
-)
-
-var (
-	img1    = flag.String("img1", "koala.png", "First image path")
-	img2    = flag.String("img2", "alpaca.png", "Second image path")
-	key = flag.String("key", "alpacaAndKoala!!", "Key")
-)
-
-func main() {
-	ga := goangecryption.NewPNGHide(*key)
-	_, err := ga.Hide(*img1, *img2)
-	if err != nil {
-		logrus.Fatalln("Error while hidding :", err)
-	}
-}
-```
+*TDB*

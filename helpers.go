@@ -44,6 +44,7 @@ func encryptCBC(key, iv, plaintext []byte) ([]byte, error) {
 		return nil, fmt.Errorf("plaintext is not a multiple of the block size")
 	}
 
+	// Create the cipher
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, fmt.Errorf("Error while creating the AES block: %s", err)
@@ -57,32 +58,34 @@ func encryptCBC(key, iv, plaintext []byte) ([]byte, error) {
 }
 
 // decryptECB
-func decryptECB(data, key []byte) []byte {
+func decryptECB(data, key []byte) ([]byte, error) {
+	// Create the cipher
 	cipher, err := aes.NewCipher(key)
-	if err == nil {
-		cipher.Decrypt(data, data)
-		return data
+	if err != nil {
+		return nil, fmt.Errorf("Error while creating the AES block: %s", err)
 	}
-	return nil
+
+	// Decrypt
+	cipher.Decrypt(data, data)
+	
+	return data, nil
 }
 
 // decryptCBC
-func decryptCBC(ciphertext, key, iv []byte) []byte {
+func decryptCBC(ciphertext, key, iv []byte) ([]byte, error) {
+	if len(ciphertext) < aes.BlockSize {
+		return nil, fmt.Errorf("Text is too short")
+	}
+
 	// Create the AES cipher
 	block, err := aes.NewCipher(key)
 	if err != nil {
-		panic(err)
-	}
-
-	// Before even testing the decryption,
-	// if the text is too small, then it is incorrect
-	if len(ciphertext) < aes.BlockSize {
-		panic("Text is too short")
+		return nil, fmt.Errorf("Error while creating the AES block: %s", err)
 	}
 
 	// CBC mode always works in whole blocks.
 	if len(ciphertext)%aes.BlockSize != 0 {
-		panic("ciphertext is not a multiple of the block size")
+		return nil, fmt.Errorf("ciphertext is not a multiple of the block size")
 	}
 
 	mode := cipher.NewCBCDecrypter(block, iv)
@@ -90,5 +93,5 @@ func decryptCBC(ciphertext, key, iv []byte) []byte {
 	// CryptBlocks can work in-place if the two arguments are the same.
 	mode.CryptBlocks(ciphertext, ciphertext)
 
-	return ciphertext
+	return ciphertext, nil
 }
