@@ -76,8 +76,14 @@ func (p *GoAngecryption) HideJPG(img1, img2, dst string) ([]byte, error) {
 		return nil, fmt.Errorf("Error while padding the result : %s", err)
 	}
 
+	// Decrypt the result with AES-CBC
+	final, err := decryptCBC(resultPadded, []byte(p.Key), iv)
+	if err != nil {
+		return nil, fmt.Errorf("Error while decrupting the final file with AES-CBC : %s", err)
+	}
+
 	// Write the result file
-	err = ioutil.WriteFile(dst, resultPadded, 0644)
+	err = ioutil.WriteFile(dst, final, 0644)
 	if err != nil {
 		return nil, fmt.Errorf("Error while writing the final file : %s", err)
 	}
