@@ -12,7 +12,7 @@ func TestHideJPG(t *testing.T) {
 	ga := NewGoAngecryption("AngeCryptionKey!")
 
 	// Hide the image
-	iv, err := ga.HideJPG("example/jpg/alpaca.jpg", "example/jpg/koala.jpg", "example/jpg/result1.jpg")
+	iv, err := ga.HideInJPG("example/jpg/alpaca.jpg", "example/jpg/koala.jpg", "example/jpg/result1.jpg")
 	if err != nil {
 		t.Fatal("Error while hidding :", err)
 	}

@@ -11,8 +11,8 @@ import (
 // Functions
 //------------------------------------------------------------------------------
 
-// HideFLV hides the image1 into the image2.
-func (p *GoAngecryption) HideFLV(img1, img2, dst string) ([]byte, error) {
+// HideInFLV hides the source into the target and writes the result file.
+func (p *GoAngecryption) HideInFLV(img1, img2, dst string) ([]byte, error) {
 	// Read the img1
 	file1, err := ioutil.ReadFile(img1)
 	if err != nil {
@@ -70,7 +70,7 @@ func (p *GoAngecryption) HideFLV(img1, img2, dst string) ([]byte, error) {
 		return nil, fmt.Errorf("Error while encrypting the file : %s", err)
 	}
 
-	// Append
+	// Append the file2
 	result = append(result, file2Padded[9:]...)
 
 	// Right padding of the result

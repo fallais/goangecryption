@@ -94,7 +94,7 @@ func (p *GoAngecryption) HidePNG(img1, img2, dst string) ([]byte, error) {
 	// Decrypt the result with AES-CBC
 	final, err := decryptCBC(finalPadded, []byte(p.Key), iv)
 	if err != nil {
-		return nil, fmt.Errorf("Error while decrupting the final file with AES-CBC : %s", err)
+		return nil, fmt.Errorf("Error while decrypting the final file with AES-CBC : %s", err)
 	}
 
 	// Write the result file

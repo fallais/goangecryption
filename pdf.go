@@ -4,38 +4,41 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
-	"strings"
 )
 
 //------------------------------------------------------------------------------
 // Functions
 //------------------------------------------------------------------------------
 
-// HideInJPG hides the source into the target and writes the result file.
-func (p *GoAngecryption) HideInJPG(s, t, r string) ([]byte, error) {
+// HideInPDF hides the source into the target and writes the result file.
+func (p *GoAngecryption) HideInPDF(s, t, r string) ([]byte, error) {
 	// Read the source
-	file1, err := ioutil.ReadFile(s)
+	source, err := ioutil.ReadFile(s)
 	if err != nil {
 		return nil, fmt.Errorf("Error while reading the file1 : %s", err)
 	}
 
 	// Right padding of the source
-	file1Padded, err := padding(file1, 16)
+	sourcePadded, err := padding(source, 16)
 	if err != nil {
 		return nil, fmt.Errorf("Error while padding the file1 : %s", err)
 	}
 
-	// Process the size
-	size := len(file1Padded) - BlockSize
+	// Read the target
+	target, err := ioutil.ReadFile(t)
+	if err != nil {
+		return nil, fmt.Errorf("Error while reading the file2 : %s", err)
+	}
+
+	// Right padding of the target
+	targetPadded, err := padding(target, 16)
+	if err != nil {
+		return nil, fmt.Errorf("Error while padding the file2 : %s", err)
+	}
 
 	// Create C1
 	var c1 bytes.Buffer
-	c1.WriteString(JPGHeader)
-	c1.WriteString("\xFF\xFE")
-	u := uint16(size)
-	c1.WriteByte(uint8(u >> 8))
-	c1.WriteByte(uint8(u >> 0))
-	c1.WriteString(strings.Repeat("\x00", 10))
+	c1.WriteString("%PDF-\x00obj\nstream")
 
 	// Decrypt C1 with AES-ECB
 	c1Decrypted, err := decryptECB(c1.Bytes(), []byte(p.Key))
@@ -44,31 +47,20 @@ func (p *GoAngecryption) HideInJPG(s, t, r string) ([]byte, error) {
 	}
 
 	// XOR C1 with P1
-	iv, err := xorBytes(c1Decrypted, []byte(file1[:BlockSize]))
+	iv, err := xorBytes(c1Decrypted, []byte(source[:BlockSize]))
 	if err != nil {
 		return nil, fmt.Errorf("Error while xoring the arrays : %s", err)
 	}
 
 	// Encrypt
-	result, err := encryptCBC([]byte(p.Key), iv, file1Padded)
+	result, err := encryptCBC([]byte(p.Key), iv, sourcePadded)
 	if err != nil {
 		return nil, fmt.Errorf("Error while encrypting the file : %s", err)
 	}
 
-	// Read the img2
-	file2, err := ioutil.ReadFile(t)
-	if err != nil {
-		return nil, fmt.Errorf("Error while reading the file2 : %s", err)
-	}
-
-	// Right padding of the img2
-	file2Padded, err := padding(file2, 16)
-	if err != nil {
-		return nil, fmt.Errorf("Error while padding the file2 : %s", err)
-	}
-
-	// Append
-	result = append(result, file2Padded[2:]...)
+	// Append the file2
+	result = append(result, []byte("\nendstream\nendobj\n")...)
+	result = append(result, targetPadded...)
 
 	// Right padding of the result
 	resultPadded, err := padding(result, 16)
@@ -79,13 +71,13 @@ func (p *GoAngecryption) HideInJPG(s, t, r string) ([]byte, error) {
 	// Decrypt the result with AES-CBC
 	final, err := decryptCBC(resultPadded, []byte(p.Key), iv)
 	if err != nil {
-		return nil, fmt.Errorf("Error while decrupting the final file with AES-CBC : %s", err)
+		return nil, fmt.Errorf("Error while decrypting the final file with AES-CBC : %s", err)
 	}
 
 	// Write the result file
 	err = ioutil.WriteFile(r, final, 0644)
 	if err != nil {
-		return nil, fmt.Errorf("Error while writing the final file : %s", err)
+		return nil, fmt.Errorf("Error while writing the result file : %s", err)
 	}
 
 	return iv, nil
