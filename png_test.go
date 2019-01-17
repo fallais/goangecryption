@@ -4,6 +4,7 @@ import (
 	"testing"
 	"io/ioutil"
 	"bytes"
+	"fmt"
 )
 
 // HidePNG testing
@@ -16,6 +17,9 @@ func TestHidePNG(t *testing.T) {
 	if err != nil {
 		t.Fatal("Error while hidding :", err)
 	}
+
+	fmt.Println("IV is :", fmt.Sprintf("%x", iv))
+	t.Log("IV is :", fmt.Sprintf("%x", iv))
 
 	f1, err := ioutil.ReadFile("example/png/result1.png")
 	if err != nil {

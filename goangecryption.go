@@ -7,7 +7,7 @@ const PNGHeader = "\x89PNG\r\n\x1a\n"
 const JPGHeader = "\xFF\xD8"
 
 // FakeChunkType is the fake PNG chunk type.
-const FakeChunkType = "ilym"
+const FakeChunkType = "rmll"
 
 // BlockSize is the size of the block.
 const BlockSize = 16

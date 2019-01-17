@@ -31,8 +31,7 @@ In order to determine the first encrypted block :
 - Decrypt the block with **AES-ECB**
 - XOR this block with the first `16 bytes` of the `img1`
 
-`IV` is the result : `56a26af016bfac33f529597c35ad977a`.  
-And the key is still : `alpacaAndKoala!!`.
+`IV` is the result : `78d002816ba7c3de88de568f6a591d06`. And the key is still : `AngeCryptionKey!`.
 
 ### Step 2 : prepare the storage chunk
 
