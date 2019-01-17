@@ -8,19 +8,17 @@ This library is the **Golang** version of the great work of [Ange Albertini](htt
 
 ### Prerequisites
 
-**Key** (length must be *16*) : `alpacaAndKoala!!`
+**Key** (length must be *16*) : `AngeCryptionKey!`
 
-**FakeChunkType** (whatever the 4 chars string starting with lowercase) : `ilym`
+**FakeChunkType** (whatever the 4 chars string you want, lowercase) : `rmll`
 
 **First image** :
 
-![I1](https://github.com/fallais/goangecryption/blob/master/example/alpaca.png)
+![I1](https://github.com/fallais/goangecryption/blob/master/example/png/google.png)
 
 **Second image** :
 
-![I2](https://github.com/fallais/goangecryption/blob/master/example/koala.png)
-
-> A PNG chunk is composed of : **Size (4-byte)** | **Name (4-byte)** | **Data (n-byte)** | **CRC32 (4-byte)**
+![I2](https://github.com/fallais/goangecryption/blob/master/example/png/duckduckgo.png)
 
 ### Step 1 : determine the IV
 
@@ -29,7 +27,7 @@ In order to determine the first encrypted block :
 - Open the `img1`
 - Right padding of the `img1` (modulo *16*)
 - Calculate the size of the `img1` and substract `16` (which is the **BlockSize**)
-- Create the block : **PNG Header** +  **Size** + **Fake Type (ilym)**
+- Create the block : **PNG Header** +  **Size** + **Fake Type (rmll)**
 - Decrypt the block with **AES-ECB**
 - XOR this block with the first `16 bytes` of the `img1`
 
